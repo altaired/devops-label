@@ -16,6 +16,6 @@ jobs:
       - run: npm install
       - name: PR Validator
         uses: ./ # Uses an action in the root directory
-          id: validator
-          with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
+        id: validator
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
