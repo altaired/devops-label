@@ -4,7 +4,7 @@ import {} from 'js-yaml';
 
 async function run(): Promise<void> {
   const ghToken = core.getInput('github-token');
-  // const configPath = core.getInput('configuration-path');
+  const configPath = core.getInput('configuration-path');
 
   const prNumber = getPRNumber();
 
@@ -49,4 +49,5 @@ function getPRNumber(): number | undefined {
   return pr.number;
 }
 
+core.debug('Hello World!');
 run();

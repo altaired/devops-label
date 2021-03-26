@@ -59,11 +59,12 @@ var core = __importStar(require("@actions/core"));
 var github_1 = require("@actions/github");
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var ghToken, prNumber, ghClient, pullRequest, files;
+        var ghToken, configPath, prNumber, ghClient, pullRequest, files;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     ghToken = core.getInput('github-token');
+                    configPath = core.getInput('configuration-path');
                     prNumber = getPRNumber();
                     if (prNumber == undefined) {
                         return [2 /*return*/];
