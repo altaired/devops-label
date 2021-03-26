@@ -1,0 +1,16 @@
+summary-path: contributions/
+categories:
+  course-automation:
+    - contributions/course-automation/*/*
+  presentation:
+    - contributions/course-automation/week[1-9]/*/*
+  demo:
+    - contributions/demo/*/*
+  essay:
+    - contributions/essay/*/*
+  executable-tutorial:
+    - contributions/executable-tutorial/*/*
+  feedback:
+    - contributions/feedback/*/*
+  open-source:
+    - contributions/open-source/*/*
