@@ -1,7 +1,7 @@
 name: 'PR Validator'
 description: 'Action that validated each proposal and assigns the appropriate labels to it'
 inputs:
-  github-token: # A github token with acces to the repoitory
+  github-token:
     description: 'A valid GitHub token with acces to the repoitory'
     required: true
     default: ''

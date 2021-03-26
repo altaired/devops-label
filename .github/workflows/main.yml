@@ -15,7 +15,7 @@ jobs:
           node-version: '12'
       - name: Install dependencies
         run: npm install
-      - name: Translating typescrit
+      - name: Translating typescript
         run: npm run build
       - name: PR Validator
         uses: ./ # Uses an action in the root directory
