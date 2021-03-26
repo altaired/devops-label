@@ -2,14 +2,14 @@ import * as core from '@actions/core';
 import { getOctokit, context } from '@actions/github';
 import {} from 'js-yaml';
 
-async function run(): Promise<void> {
+async function run(): Promise<boolean> {
   const ghToken = core.getInput('github-token');
   const configPath = core.getInput('configuration-path');
 
   const prNumber = getPRNumber();
 
   if (prNumber == undefined) {
-    return;
+    return false;
   }
 
   const ghClient = getOctokit(ghToken);
@@ -22,7 +22,7 @@ async function run(): Promise<void> {
 
   const files = await getPRFiles(ghClient, prNumber);
 
-  return;
+  return true;
 }
 
 async function getPRFiles(client: any, prNumber: number): Promise<any> {
