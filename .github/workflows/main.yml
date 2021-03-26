@@ -13,7 +13,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '12'
-      - run: npm install
+      - name: Install dependencies
+        run: npm install
+      - name: Translating typescrit
+        run: npm run build
       - name: PR Validator
         uses: ./ # Uses an action in the root directory
         id: validator
