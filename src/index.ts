@@ -51,5 +51,5 @@ import {} from 'js-yaml';
 
 // core.debug('Hello World!');
 // run();
-
+console.log('Hello Sweden!');
 core.debug('Hello World');
