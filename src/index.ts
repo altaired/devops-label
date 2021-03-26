@@ -13,7 +13,6 @@ async function run(): Promise<boolean> {
     return false;
   }
 
-  console.log('creating client...');
   const ghClient = getOctokit(ghToken);
 
   const { data: pullRequest } = await ghClient.pulls.get({
@@ -22,7 +21,6 @@ async function run(): Promise<boolean> {
     pull_number: prNumber,
   });
 
-  console.log('getting PR files...');
   const files = await getPRFiles(ghClient, prNumber);
 
   return true;
