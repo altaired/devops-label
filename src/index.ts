@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 import { getOctokit, context } from '@actions/github';
-// import {} from 'js-yaml';
+import * as yaml from 'js-yaml';
 
 async function run(): Promise<boolean> {
   console.log('fetching inputs...');
@@ -23,6 +23,8 @@ async function run(): Promise<boolean> {
 
   const files = await getPRFiles(ghClient, prNumber);
 
+  const config = await getConfiguration(ghClient, configPath);
+  console.log(config);
   return true;
 }
 
@@ -48,6 +50,26 @@ function getPRNumber(): number | undefined {
     return undefined;
   }
   return pr.number;
+}
+
+async function fetchFile(client: any, path: string): Promise<string> {
+  const response: any = await client.repos.getContents({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    path: path,
+    ref: context.sha,
+  });
+
+  return Buffer.from(response.data.content, response.data.encoding).toString();
+}
+
+async function getConfiguration(client: any, configPath: string): Promise<any> {
+  const configurationContent: string = await fetchFile(client, configPath);
+  try {
+    return yaml.load(configurationContent);
+  } catch (error) {
+    return '';
+  }
 }
 
 run();
