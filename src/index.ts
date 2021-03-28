@@ -53,7 +53,7 @@ function getPRNumber(): number | undefined {
 }
 
 async function fetchFile(client: any, path: string): Promise<string> {
-  const response: any = await client.repos.getContents({
+  const response: any = await client.repos.getContent({
     owner: context.repo.owner,
     repo: context.repo.repo,
     path: path,
