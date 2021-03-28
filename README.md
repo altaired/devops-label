@@ -1,3 +1,3 @@
 # devops course label
 
-TTT
+TT
