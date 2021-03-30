@@ -25,6 +25,10 @@ async function run(): Promise<boolean> {
 
   const config = await getConfiguration(ghClient, configPath);
   console.log(config);
+
+  const { categories, issue } = config;
+  console.log(categories);
+  console.log(issue);
   return true;
 }
 
