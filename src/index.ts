@@ -29,6 +29,14 @@ async function run(): Promise<boolean> {
   const { categories, issue } = config;
   console.log(categories);
   console.log(issue);
+  verifySingleCategory(files, categories);
+  return true;
+}
+
+function verifySingleCategory(files: any[], categories: any): boolean {
+  for (let category in categories) {
+    console.log(category);
+  }
   return true;
 }
 
