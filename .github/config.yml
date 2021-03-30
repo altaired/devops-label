@@ -1,18 +1,16 @@
 issue: 3
 categories:
   course-automation:
-    - contributions/course-automation/*/*
+    - demo/contributions/course-automation/*/*
   presentation:
-    - contributions/course-automation/week[1-9]/*/*
+    - demo/contributions/course-automation/week[1-9]/*/*
   demo:
-    - contributions/demo/*/*
+    - demo/contributions/demo/*/*
   essay:
-    - contributions/essay/*/*
+    - demo/contributions/essay/*/*
   executable-tutorial:
-    - contributions/executable-tutorial/*/*
+    - demo/contributions/executable-tutorial/*/*
   feedback:
-    - contributions/feedback/*/*
+    - demo/contributions/feedback/*/*
   open-source:
-    - contributions/open-source/*/*
-  hello:
-    - README.md
+    - demo/contributions/open-source/*/*
