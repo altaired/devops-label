@@ -13,11 +13,13 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '12'
-      - name: Install dependencies
+      - name: Install
         run: npm install
-      - name: Building
+      - name: Test
+        run: npm run test
+      - name: Build
         run: npm run build
-      - name: PR Validator
+      - name: Run
         uses: ./ # Uses an action in the root directory
         id: validator
         with:

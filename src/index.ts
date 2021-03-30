@@ -2,7 +2,6 @@ import * as core from '@actions/core';
 import { getOctokit, context } from '@actions/github';
 import * as yaml from 'js-yaml';
 import minimatch from 'minimatch';
-import { assert } from 'node:console';
 
 async function run(): Promise<boolean> {
   console.log('fetching inputs...');
