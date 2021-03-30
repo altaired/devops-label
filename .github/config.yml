@@ -14,3 +14,5 @@ categories:
     - contributions/feedback/*/*
   open-source:
     - contributions/open-source/*/*
+  test:
+    - README.md

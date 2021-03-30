@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import { getOctokit, context } from '@actions/github';
 import * as yaml from 'js-yaml';
+import minimatch from 'minimatch';
 
 async function run(): Promise<boolean> {
   console.log('fetching inputs...');
@@ -29,15 +30,18 @@ async function run(): Promise<boolean> {
   const { categories, issue } = config;
   console.log(categories);
   console.log(issue);
-  verifySingleCategory(files, categories);
+  checkCategoryLabel(files, categories);
   return true;
 }
 
-function verifySingleCategory(files: any[], categories: any): boolean {
-  for (let category in categories) {
-    console.log(category);
+function checkCategoryLabel(files: any[], globs: any): string | undefined {
+  for (let category in globs) {
+    if (files.every((file) => globs[category].any((glob: string) => minimatch(file.filename, glob)))) {
+      console.log(`matched with label ${category}`);
+    }
   }
-  return true;
+  console.log('no match found');
+  return undefined;
 }
 
 async function getPRFiles(client: any, prNumber: number): Promise<any> {
