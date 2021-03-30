@@ -30,14 +30,42 @@ async function run(): Promise<boolean> {
   const { categories, issue } = config;
   console.log(categories);
   console.log(issue);
-  checkCategoryLabel(files, categories);
+  const label = checkCategoryLabel(files, categories);
+  if (label != undefined) {
+    await setLabel(ghClient, prNumber, label);
+  } else {
+    setFailed('no single match found, make sure only one category is modified');
+  }
   return true;
+}
+
+async function setLabel(client: any, prNumber: number, label: string): Promise<boolean> {
+  const current = await client.issues.listLabelsOnIssue({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    issue_number: prNumber,
+  });
+
+  console.log(current);
+
+  await client.issues.update({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    issue_number: prNumber,
+    labels: [label],
+  });
+  return true;
+}
+
+function setFailed(error: string): void {
+  core.setFailed(error);
 }
 
 function checkCategoryLabel(files: any[], globs: any): string | undefined {
   for (let category in globs) {
     if (files.every((file) => globs[category].some((glob: string) => minimatch(file.filename, glob)))) {
       console.log(`matched with label ${category}`);
+      return category;
     }
   }
   console.log('no match found');
