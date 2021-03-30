@@ -46,13 +46,16 @@ async function setLabel(client: any, prNumber: number, label: string): Promise<b
     issue_number: prNumber,
   });
 
+  const { data } = current;
+  const labels: string[] = data.map((label: any) => label.name);
+
   console.log(current);
 
   await client.issues.update({
     owner: context.repo.owner,
     repo: context.repo.repo,
     issue_number: prNumber,
-    labels: [label],
+    labels: [...labels, label],
   });
   return true;
 }
