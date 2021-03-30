@@ -36,7 +36,7 @@ async function run(): Promise<boolean> {
 
 function checkCategoryLabel(files: any[], globs: any): string | undefined {
   for (let category in globs) {
-    if (files.every((file) => globs[category].any((glob: string) => minimatch(file.filename, glob)))) {
+    if (files.every((file) => globs[category].some((glob: string) => minimatch(file.filename, glob)))) {
       console.log(`matched with label ${category}`);
     }
   }
