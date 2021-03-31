@@ -1,13 +1,24 @@
 import * as core from '@actions/core';
 import { getOctokit, context } from '@actions/github';
+import { GitHub } from '@actions/github/lib/utils';
 import * as yaml from 'js-yaml';
 import minimatch from 'minimatch';
 
 export interface Configuration {
   issue: number;
   dir: string;
-  categories: any[];
+  categories: any;
 }
+
+export interface ProposalStatistics {
+  total: number;
+  open: number;
+  closed: number;
+  openByCategory: { name: string; count: number }[];
+  closedByCategory: { name: string; count: number }[];
+}
+
+type Github = InstanceType<typeof GitHub>;
 
 async function run(): Promise<boolean> {
   // Fetching action inputs
@@ -20,10 +31,15 @@ async function run(): Promise<boolean> {
     return false;
   }
 
-  const ghClient = getOctokit(ghToken);
+  const ghClient: Github = getOctokit(ghToken);
   const files = await getPullRequestFiles(ghClient, prNumber);
 
   const config = await getConfiguration(ghClient, configPath);
+  if (config == undefined) {
+    setFailed('no configuration provided');
+    return false;
+  }
+
   const { categories, issue, dir } = config;
 
   // Only continue if all files are in the specified path
@@ -43,10 +59,12 @@ async function run(): Promise<boolean> {
   if (addProposalLabel) {
     addLabel(ghClient, prNumber, 'proposal');
   }
+
+  await getProposalStatistics(ghClient, categories);
   return true;
 }
 
-async function addLabel(client: any, prNumber: number, label: string): Promise<boolean> {
+async function addLabel(client: Github, prNumber: number, label: string): Promise<boolean> {
   const current = await client.issues.listLabelsOnIssue({
     owner: context.repo.owner,
     repo: context.repo.repo,
@@ -63,6 +81,15 @@ async function addLabel(client: any, prNumber: number, label: string): Promise<b
     labels: [...labels, label],
   });
   return true;
+}
+
+async function getProposalStatistics(client: Github, categories: any): Promise<any> {
+  for (let category in categories) {
+    const result = await client.search.issuesAndPullRequests({
+      q: `is:pull-request+label:proposal+label:${category}`,
+    });
+    console.log(result);
+  }
 }
 
 function setFailed(error: string): void {
@@ -105,7 +132,7 @@ export function shouldHaveProposalLabel(files: any[], category: any): boolean {
   return files.some((file) => file.status === 'added' && minimatch(file.filename, `${glob}${folder}/${proposal}`));
 }
 
-async function getPullRequestFiles(client: any, prNumber: number): Promise<any> {
+async function getPullRequestFiles(client: Github, prNumber: number): Promise<any> {
   const filesResponse = client.pulls.listFiles.endpoint.merge({
     owner: context.repo.owner,
     repo: context.repo.repo,
@@ -123,7 +150,7 @@ function getPullRequestNumber(): number | undefined {
   return pr.number;
 }
 
-async function fetchFile(client: any, path: string): Promise<string> {
+async function fetchFile(client: Github, path: string): Promise<string> {
   const response: any = await client.repos.getContent({
     owner: context.repo.owner,
     repo: context.repo.repo,
@@ -134,12 +161,12 @@ async function fetchFile(client: any, path: string): Promise<string> {
   return Buffer.from(response.data.content, response.data.encoding).toString();
 }
 
-async function getConfiguration(client: any, configPath: string): Promise<any> {
+async function getConfiguration(client: Github, configPath: string): Promise<Configuration | undefined> {
   const configurationContent: string = await fetchFile(client, configPath);
   try {
-    return yaml.load(configurationContent);
+    return yaml.load(configurationContent) as Configuration;
   } catch (error) {
-    return '';
+    return undefined;
   }
 }
 
