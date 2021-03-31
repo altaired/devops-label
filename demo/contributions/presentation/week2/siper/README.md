@@ -1,1 +1,1 @@
-This is a proposal1
+This is a proposal2
