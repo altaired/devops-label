@@ -82,26 +82,23 @@ function run() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    console.log('fetching inputs...');
                     ghToken = core.getInput('github-token');
                     configPath = core.getInput('configuration-path');
-                    prNumber = getPRNumber();
+                    prNumber = getPullRequestNumber();
                     if (prNumber == undefined) {
-                        console.log('invalid pr number');
+                        setFailed('invalid pr number');
                         return [2 /*return*/, false];
                     }
                     ghClient = github_1.getOctokit(ghToken);
-                    return [4 /*yield*/, getPRFiles(ghClient, prNumber)];
+                    return [4 /*yield*/, getPullRequestFiles(ghClient, prNumber)];
                 case 1:
                     files = _a.sent();
-                    console.log('parsing configuration file...');
                     return [4 /*yield*/, getConfiguration(ghClient, configPath)];
                 case 2:
                     config = _a.sent();
                     categories = config.categories, issue = config.issue, dir = config.dir;
                     // Only continue if all files are in the specified path
                     if (!files.map(function (file) { return file.filename; }).every(function (file) { return minimatch_1.default(file, dir); })) {
-                        console.log('files outside config directory');
                         return [2 /*return*/, false];
                     }
                     label = checkCategoryLabel(files, categories);
@@ -116,7 +113,6 @@ function run() {
                 case 5:
                     addProposalLabel = shouldHaveProposalLabel(files, categories[label]);
                     if (addProposalLabel) {
-                        console.log('pr is a new proposal, adding label');
                         addLabel(ghClient, prNumber, 'proposal');
                     }
                     return [2 /*return*/, true];
@@ -138,7 +134,6 @@ function addLabel(client, prNumber, label) {
                     current = _a.sent();
                     data = current.data;
                     labels = data.map(function (label) { return label.name; });
-                    console.log("current labels: [" + labels.join(', ') + "]");
                     return [4 /*yield*/, client.issues.update({
                             owner: github_1.context.repo.owner,
                             repo: github_1.context.repo.repo,
@@ -162,7 +157,6 @@ function checkCategoryLabel(files, categories) {
             var sameCategory = files.every(function (file) { return minimatch_1.default(file.filename, "" + glob_1 + folder_1 + "/" + suffix_1); });
             var sameDirectory = checkSameDirectory(files, categories[category]);
             if (sameCategory && sameDirectory) {
-                console.log("matched with label " + category);
                 return { value: category };
             }
         }
@@ -172,7 +166,6 @@ function checkCategoryLabel(files, categories) {
         if (typeof state_1 === "object")
             return state_1.value;
     }
-    console.log('no match found');
     return undefined;
 }
 exports.checkCategoryLabel = checkCategoryLabel;
@@ -199,9 +192,9 @@ function shouldHaveProposalLabel(files, category) {
     return files.some(function (file) { return file.status === 'added' && minimatch_1.default(file.filename, "" + glob + folder + "/" + proposal); });
 }
 exports.shouldHaveProposalLabel = shouldHaveProposalLabel;
-function getPRFiles(client, prNumber) {
+function getPullRequestFiles(client, prNumber) {
     return __awaiter(this, void 0, void 0, function () {
-        var filesResponse, files, _i, files_1, file;
+        var filesResponse;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -211,19 +204,12 @@ function getPRFiles(client, prNumber) {
                         pull_number: prNumber,
                     });
                     return [4 /*yield*/, client.paginate(filesResponse)];
-                case 1:
-                    files = _a.sent();
-                    console.log('changed files:');
-                    for (_i = 0, files_1 = files; _i < files_1.length; _i++) {
-                        file = files_1[_i];
-                        console.log("   " + file.filename + " (" + file.status + ")");
-                    }
-                    return [2 /*return*/, files];
+                case 1: return [2 /*return*/, _a.sent()];
             }
         });
     });
 }
-function getPRNumber() {
+function getPullRequestNumber() {
     var pr = github_1.context.payload.pull_request;
     if (!pr) {
         return undefined;

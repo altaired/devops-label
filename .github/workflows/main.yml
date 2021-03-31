@@ -1,7 +1,7 @@
 on: [pull_request]
 
 jobs:
-  pr_labeler:
+  validator:
     runs-on: ubuntu-latest
     name: Labeling and Validation
     steps:
@@ -9,14 +9,6 @@ jobs:
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setting up node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '12'
-      - name: Install
-        run: npm install
-      - name: Build
-        run: npm run build
       - name: Run
         uses: ./ # Uses an action in the root directory
         id: validator

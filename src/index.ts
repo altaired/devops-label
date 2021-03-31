@@ -3,26 +3,31 @@ import { getOctokit, context } from '@actions/github';
 import * as yaml from 'js-yaml';
 import minimatch from 'minimatch';
 
+export interface Configuration {
+  issue: number;
+  dir: string;
+  categories: any[];
+}
+
 async function run(): Promise<boolean> {
-  console.log('fetching inputs...');
-  const ghToken = core.getInput('github-token');
-  const configPath = core.getInput('configuration-path');
-  const prNumber = getPRNumber();
+  // Fetching action inputs
+  const ghToken: string = core.getInput('github-token');
+  const configPath: string = core.getInput('configuration-path');
+  const prNumber: number | undefined = getPullRequestNumber();
+
   if (prNumber == undefined) {
-    console.log('invalid pr number');
+    setFailed('invalid pr number');
     return false;
   }
 
   const ghClient = getOctokit(ghToken);
-  const files = await getPRFiles(ghClient, prNumber);
+  const files = await getPullRequestFiles(ghClient, prNumber);
 
-  console.log('parsing configuration file...');
   const config = await getConfiguration(ghClient, configPath);
   const { categories, issue, dir } = config;
 
   // Only continue if all files are in the specified path
   if (!files.map((file: any) => file.filename).every((file: string) => minimatch(file, dir))) {
-    console.log('files outside config directory');
     return false;
   }
 
@@ -36,7 +41,6 @@ async function run(): Promise<boolean> {
 
   const addProposalLabel = shouldHaveProposalLabel(files, categories[label]);
   if (addProposalLabel) {
-    console.log('pr is a new proposal, adding label');
     addLabel(ghClient, prNumber, 'proposal');
   }
   return true;
@@ -51,7 +55,6 @@ async function addLabel(client: any, prNumber: number, label: string): Promise<b
 
   const { data } = current;
   const labels: string[] = data.map((label: any) => label.name);
-  console.log(`current labels: [${labels.join(', ')}]`);
 
   await client.issues.update({
     owner: context.repo.owner,
@@ -73,12 +76,10 @@ export function checkCategoryLabel(files: any[], categories: any): string | unde
       const sameCategory = files.every((file) => minimatch(file.filename, `${glob}${folder}/${suffix}`));
       const sameDirectory = checkSameDirectory(files, categories[category]);
       if (sameCategory && sameDirectory) {
-        console.log(`matched with label ${category}`);
         return category;
       }
     }
   }
-  console.log('no match found');
   return undefined;
 }
 
@@ -104,23 +105,17 @@ export function shouldHaveProposalLabel(files: any[], category: any): boolean {
   return files.some((file) => file.status === 'added' && minimatch(file.filename, `${glob}${folder}/${proposal}`));
 }
 
-async function getPRFiles(client: any, prNumber: number): Promise<any> {
+async function getPullRequestFiles(client: any, prNumber: number): Promise<any> {
   const filesResponse = client.pulls.listFiles.endpoint.merge({
     owner: context.repo.owner,
     repo: context.repo.repo,
     pull_number: prNumber,
   });
 
-  const files = await client.paginate(filesResponse);
-
-  console.log('changed files:');
-  for (const file of files) {
-    console.log(`   ${file.filename} (${file.status})`);
-  }
-  return files;
+  return await client.paginate(filesResponse);
 }
 
-function getPRNumber(): number | undefined {
+function getPullRequestNumber(): number | undefined {
   const pr = context.payload.pull_request;
   if (!pr) {
     return undefined;

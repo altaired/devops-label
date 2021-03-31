@@ -23,7 +23,7 @@ const config = {
   },
 };
 
-describe('directory', () => {
+describe('directory validation', () => {
   it('has same directory', () => {
     const files = [
       { filename: 'demo/contributions/presentation/week2/siper/README.md', status: 'added' },
@@ -50,7 +50,7 @@ describe('directory', () => {
   });
 });
 
-describe('category label', () => {
+describe('determining a category label', () => {
   it('multiple directories changed, should be undefined', () => {
     const files = [
       { filename: 'demo/contributions/presentation/week2/siper/README.md', status: 'added' },

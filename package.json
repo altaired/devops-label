@@ -4,7 +4,7 @@
   "description": "A GitHub action for validating incoming proposals through PRs",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && ncc build --source-map",
     "start": "tsc && node dist/index.js",
     "test": "jest"
   },
