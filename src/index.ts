@@ -113,15 +113,15 @@ async function publishProposalStatistics(client: Github, issue: number, stats: P
 
 function generateStatisticsBody(stats: ProposalStatistics) {
   const tableRows = stats.categories.map((category) => {
-    return `| ${category.category} | ${category.open} | ${category.closed} | ${category.total} | \n`;
+    return `|${category.category}|${category.open}|${category.closed}|${category.total}|\n`;
   });
   return `
-    # Generated proposal summary \n
-    updated: ${new Date().toISOString()} \n
+  # Generated proposal summary
+  updated: ${new Date().toISOString()}
 
-    | Category      | Open PRs      | Closed PRs  | Total | \n
-    | ------------- |:-------------:| -----------:| -----:| \n
-    ${tableRows}
+  | Category      | Open PRs      | Closed PRs  | Total |
+  | ------------- |:-------------:| -----------:| -----:|
+  ${tableRows}
   `;
 }
 
