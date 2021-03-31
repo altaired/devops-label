@@ -78,7 +78,7 @@ var yaml = __importStar(__nccwpck_require__(1917));
 var minimatch_1 = __importDefault(__nccwpck_require__(3973));
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var ghToken, configPath, prNumber, ghClient, files, config, categories, issue, dir, label, addProposalLabel;
+        var ghToken, configPath, prNumber, ghClient, files, config, categories, issue, dir, label, addProposalLabel, stats;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -121,6 +121,9 @@ function run() {
                     }
                     return [4 /*yield*/, getProposalStatistics(ghClient, categories)];
                 case 6:
+                    stats = _a.sent();
+                    return [4 /*yield*/, publishProposalStatistics(ghClient, issue, stats)];
+                case 7:
                     _a.sent();
                     return [2 /*return*/, true];
             }
@@ -189,6 +192,30 @@ function getProposalStatistics(client, categories) {
             }
         });
     });
+}
+function publishProposalStatistics(client, issue, stats) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, client.issues.update({
+                        owner: github_1.context.repo.owner,
+                        repo: github_1.context.repo.repo,
+                        issue_number: issue,
+                        body: generateStatisticsBody(stats),
+                        labels: ['generated'],
+                    })];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+function generateStatisticsBody(stats) {
+    var tableRows = stats.categories.map(function (category) {
+        return "| " + category.category + " | " + category.open + " | " + category.closed + " | " + category.total + " | \n";
+    });
+    return "\n    # Generated proposal summary \n\n    updated: " + new Date().toISOString() + " \n\n\n    | Category      | Open PRs      | Closed PRs  | Total | \n\n    | ------------- |:-------------:| -----------:| -----:| \n\n    " + tableRows + "\n  ";
 }
 function search(client, category, open, merged) {
     return __awaiter(this, void 0, void 0, function () {

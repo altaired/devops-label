@@ -56,7 +56,8 @@ async function run(): Promise<boolean> {
     addLabel(ghClient, prNumber, 'proposal');
   }
 
-  await getProposalStatistics(ghClient, categories);
+  const stats: ProposalStatistics = await getProposalStatistics(ghClient, categories);
+  await publishProposalStatistics(ghClient, issue, stats);
   return true;
 }
 
@@ -97,6 +98,31 @@ async function getProposalStatistics(client: Github, categories: any): Promise<P
   return {
     categories: cat,
   };
+}
+
+async function publishProposalStatistics(client: Github, issue: number, stats: ProposalStatistics): Promise<void> {
+  await client.issues.update({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    issue_number: issue,
+    body: generateStatisticsBody(stats),
+    labels: ['generated'],
+  });
+  return;
+}
+
+function generateStatisticsBody(stats: ProposalStatistics) {
+  const tableRows = stats.categories.map((category) => {
+    return `| ${category.category} | ${category.open} | ${category.closed} | ${category.total} | \n`;
+  });
+  return `
+    # Generated proposal summary \n
+    updated: ${new Date().toISOString()} \n
+
+    | Category      | Open PRs      | Closed PRs  | Total | \n
+    | ------------- |:-------------:| -----------:| -----:| \n
+    ${tableRows}
+  `;
 }
 
 async function search(client: Github, category: string, open: boolean, merged: boolean): Promise<any> {
