@@ -212,9 +212,11 @@ function publishProposalStatistics(client, issue, stats) {
     });
 }
 function generateStatisticsBody(stats) {
-    var tableRows = stats.categories.map(function (category) {
-        return "|" + category.category + "|" + category.open + "|" + category.closed + "|" + category.total + "|\n";
-    });
+    var tableRows = stats.categories
+        .map(function (category) {
+        return "|" + category.category + "|" + category.open + "|" + category.closed + "|" + category.total + "|";
+    })
+        .join('\n');
     return "\n  # Generated proposal summary\n  updated: " + new Date().toISOString() + "\n\n  | Category      | Open PRs      | Closed PRs  | Total |\n  | ------------- |:-------------:| -----------:| -----:|\n  " + tableRows + "\n  ";
 }
 function search(client, category, open, merged) {
