@@ -10,7 +10,7 @@ categories:
     suffix: '**'
     proposal: README.md
     folder: +([a-zA-Z])?(-+([a-zA-Z]))
-    glob: demo/contributions/course-automation/week[1-9]/
+    glob: demo/contributions/presentation/week[1-9]/
   demo:
     suffix: '**'
     proposal: README.md
