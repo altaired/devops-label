@@ -156,30 +156,47 @@ function addLabel(client, prNumber, label) {
 }
 function getProposalStatistics(client, categories) {
     return __awaiter(this, void 0, void 0, function () {
-        var _a, _b, _i, category, result;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var _a, _b, _i, category, openPRs, closedPRs, _c, open_1, closed_1;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0:
                     _a = [];
                     for (_b in categories)
                         _a.push(_b);
                     _i = 0;
-                    _c.label = 1;
+                    _d.label = 1;
                 case 1:
-                    if (!(_i < _a.length)) return [3 /*break*/, 4];
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
                     category = _a[_i];
-                    return [4 /*yield*/, client.search.issuesAndPullRequests({
-                            q: "is:pull-request+label:proposal+label:" + category,
-                        })];
+                    return [4 /*yield*/, search(client, category, true, false)];
                 case 2:
-                    result = _c.sent();
-                    console.log(result);
-                    _c.label = 3;
+                    openPRs = _d.sent();
+                    return [4 /*yield*/, search(client, category, false, true)];
                 case 3:
+                    closedPRs = _d.sent();
+                    _c = [openPRs, closedPRs].map(function (res) { return res.data.total_count; }), open_1 = _c[0], closed_1 = _c[1];
+                    console.log("category: " + category);
+                    console.log("open: " + open_1);
+                    console.log("closed: " + closed_1);
+                    _d.label = 4;
+                case 4:
                     _i++;
                     return [3 /*break*/, 1];
-                case 4: return [2 /*return*/];
+                case 5: return [2 /*return*/];
             }
+        });
+    });
+}
+function search(client, category, open, merged) {
+    return __awaiter(this, void 0, void 0, function () {
+        var paramState, paramMerged, _a, owner, repo;
+        return __generator(this, function (_b) {
+            paramState = open ? 'state:open' : 'state:closed';
+            paramMerged = merged ? 'is:merged' : 'is:unmerged';
+            _a = github_1.context.repo, owner = _a.owner, repo = _a.repo;
+            return [2 /*return*/, client.search.issuesAndPullRequests({
+                    q: "is:pull-request+repo:" + owner + "/" + repo + "+label:proposal+label:" + category + "+" + paramState + "+" + paramMerged,
+                })];
         });
     });
 }

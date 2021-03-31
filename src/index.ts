@@ -85,11 +85,22 @@ async function addLabel(client: Github, prNumber: number, label: string): Promis
 
 async function getProposalStatistics(client: Github, categories: any): Promise<any> {
   for (let category in categories) {
-    const result = await client.search.issuesAndPullRequests({
-      q: `is:pull-request+label:proposal+label:${category}`,
-    });
-    console.log(result);
+    const openPRs = await search(client, category, true, false);
+    const closedPRs = await search(client, category, false, true);
+    const [open, closed] = [openPRs, closedPRs].map((res) => res.data.total_count);
+    console.log(`category: ${category}`);
+    console.log(`open: ${open}`);
+    console.log(`closed: ${closed}`);
   }
+}
+
+async function search(client: Github, category: string, open: boolean, merged: boolean): Promise<any> {
+  const paramState: string = open ? 'state:open' : 'state:closed';
+  const paramMerged: string = merged ? 'is:merged' : 'is:unmerged';
+  const { owner, repo } = context.repo;
+  return client.search.issuesAndPullRequests({
+    q: `is:pull-request+repo:${owner}/${repo}+label:proposal+label:${category}+${paramState}+${paramMerged}`,
+  });
 }
 
 function setFailed(error: string): void {
