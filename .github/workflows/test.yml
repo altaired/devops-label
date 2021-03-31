@@ -1,0 +1,20 @@
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Jest test
+    steps:
+      - uses: actions/checkout@v2
+    # installing Node
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          # this will use the latest Node 12 version
+          node-version: 12.x
+      # install dependencies
+      - run: npm install
+      # build the project
+      - run: npm run build
+      # run the tests
+      - run: npm run test

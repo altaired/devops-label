@@ -1,4 +1,4 @@
-# PR Validator for DD2476
+# PR Validator for DD2476 (Devops course)
 
 A Github Action for labeling and validating pull requests containing contribution proposals in the course DD2476 at KTH, Sweden.
 
