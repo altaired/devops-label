@@ -11,11 +11,7 @@ export interface Configuration {
 }
 
 export interface ProposalStatistics {
-  total: number;
-  open: number;
-  closed: number;
-  openByCategory: { name: string; count: number }[];
-  closedByCategory: { name: string; count: number }[];
+  categories: { category: string; open: number; closed: number; total: number }[];
 }
 
 type Github = InstanceType<typeof GitHub>;
@@ -83,15 +79,24 @@ async function addLabel(client: Github, prNumber: number, label: string): Promis
   return true;
 }
 
-async function getProposalStatistics(client: Github, categories: any): Promise<any> {
-  for (let category in categories) {
-    const openPRs = await search(client, category, true, false);
-    const closedPRs = await search(client, category, false, true);
-    const [open, closed] = [openPRs, closedPRs].map((res) => res.data.total_count);
-    console.log(`category: ${category}`);
-    console.log(`open: ${open}`);
-    console.log(`closed: ${closed}`);
-  }
+async function getProposalStatistics(client: Github, categories: any): Promise<ProposalStatistics> {
+  const cat = await Promise.all(
+    Object.keys(categories).map(async (category) => {
+      const openPRs = await search(client, category, true, false);
+      const closedPRs = await search(client, category, false, true);
+      const [open, closed] = [openPRs, closedPRs].map((res) => res.data.total_count);
+      return {
+        category,
+        open: open,
+        closed: closed,
+        total: open + closed,
+      };
+    })
+  );
+  console.log(cat);
+  return {
+    categories: cat,
+  };
 }
 
 async function search(client: Github, category: string, open: boolean, merged: boolean): Promise<any> {
