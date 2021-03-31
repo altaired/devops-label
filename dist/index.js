@@ -96,6 +96,10 @@ function run() {
                     return [4 /*yield*/, getConfiguration(ghClient, configPath)];
                 case 2:
                     config = _a.sent();
+                    if (config == undefined) {
+                        setFailed('no configuration provided');
+                        return [2 /*return*/, false];
+                    }
                     categories = config.categories, issue = config.issue, dir = config.dir;
                     // Only continue if all files are in the specified path
                     if (!files.map(function (file) { return file.filename; }).every(function (file) { return minimatch_1.default(file, dir); })) {
@@ -115,6 +119,9 @@ function run() {
                     if (addProposalLabel) {
                         addLabel(ghClient, prNumber, 'proposal');
                     }
+                    return [4 /*yield*/, getProposalStatistics(ghClient, categories)];
+                case 6:
+                    _a.sent();
                     return [2 /*return*/, true];
             }
         });
@@ -143,6 +150,35 @@ function addLabel(client, prNumber, label) {
                 case 2:
                     _a.sent();
                     return [2 /*return*/, true];
+            }
+        });
+    });
+}
+function getProposalStatistics(client, categories) {
+    return __awaiter(this, void 0, void 0, function () {
+        var _a, _b, _i, category, result;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    _a = [];
+                    for (_b in categories)
+                        _a.push(_b);
+                    _i = 0;
+                    _c.label = 1;
+                case 1:
+                    if (!(_i < _a.length)) return [3 /*break*/, 4];
+                    category = _a[_i];
+                    return [4 /*yield*/, client.search.issuesAndPullRequests({
+                            q: "is:pull-request+label:proposal+label:" + category,
+                        })];
+                case 2:
+                    result = _c.sent();
+                    console.log(result);
+                    _c.label = 3;
+                case 3:
+                    _i++;
+                    return [3 /*break*/, 1];
+                case 4: return [2 /*return*/];
             }
         });
     });
@@ -246,7 +282,7 @@ function getConfiguration(client, configPath) {
                         return [2 /*return*/, yaml.load(configurationContent)];
                     }
                     catch (error) {
-                        return [2 /*return*/, ''];
+                        return [2 /*return*/, undefined];
                     }
                     return [2 /*return*/];
             }
