@@ -16,7 +16,7 @@ Example of how to include the action in your workflow, the action is made to be 
 ```
 name: Validate and label PR
   id: vlpr
-  uses: altaired/devops-label@v1.2
+  uses: altaired/devops-label@v1.3
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     configuration-path: .github/config.yml
