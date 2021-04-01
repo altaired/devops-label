@@ -1,4 +1,7 @@
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   test:
@@ -6,7 +9,7 @@ jobs:
     name: Jest test
     steps:
       - uses: actions/checkout@v2
-    # installing Node
+      # installing Node
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:

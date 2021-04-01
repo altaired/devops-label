@@ -78,15 +78,16 @@ var yaml = __importStar(__nccwpck_require__(1917));
 var minimatch_1 = __importDefault(__nccwpck_require__(3973));
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var ghToken, configPath, prNumber, ghClient, files, config, categories, issue, dir, label, addProposalLabel, stats;
+        var ghToken, configPath, prNumber, ghClient, files, config, categories, issue, dir, label, proposalLabel, stats;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     ghToken = core.getInput('github-token');
                     configPath = core.getInput('configuration-path');
                     prNumber = getPullRequestNumber();
+                    // Check the the PR has a number, if not, it is probably an issue and not a PR
                     if (prNumber == undefined) {
-                        setFailed('invalid pr number');
+                        core.setFailed('invalid pr number');
                         return [2 /*return*/, false];
                     }
                     ghClient = github_1.getOctokit(ghToken);
@@ -97,11 +98,11 @@ function run() {
                 case 2:
                     config = _a.sent();
                     if (config == undefined) {
-                        setFailed('no configuration provided');
+                        core.setFailed('no configuration provided');
                         return [2 /*return*/, false];
                     }
                     categories = config.categories, issue = config.issue, dir = config.dir;
-                    // Only continue if all files are in the specified path
+                    // Check that the pr only contain files in the target dir, otherwise cancel
                     if (!files.map(function (file) { return file.filename; }).every(function (file) { return minimatch_1.default(file, dir); })) {
                         return [2 /*return*/, false];
                     }
@@ -112,34 +113,47 @@ function run() {
                     _a.sent();
                     return [3 /*break*/, 5];
                 case 4:
-                    setFailed('no single match found, make sure only one category is modified');
+                    core.setFailed('no distinct match found, make sure only one category is modified');
                     return [2 /*return*/, false];
                 case 5:
-                    addProposalLabel = shouldHaveProposalLabel(files, categories[label]);
-                    if (addProposalLabel) {
-                        addLabel(ghClient, prNumber, 'proposal');
-                    }
-                    return [4 /*yield*/, getProposalStatistics(ghClient, categories)];
+                    proposalLabel = shouldHaveProposalLabel(files, categories[label]);
+                    if (!proposalLabel) return [3 /*break*/, 7];
+                    return [4 /*yield*/, addLabel(ghClient, prNumber, 'proposal')];
                 case 6:
-                    stats = _a.sent();
-                    return [4 /*yield*/, publishProposalStatistics(ghClient, issue, stats)];
-                case 7:
                     _a.sent();
-                    return [2 /*return*/, true];
+                    _a.label = 7;
+                case 7: return [4 /*yield*/, getProposalStatistics(ghClient, categories)];
+                case 8:
+                    stats = _a.sent();
+                    if (!(stats !== undefined)) return [3 /*break*/, 10];
+                    return [4 /*yield*/, publishProposalStatistics(ghClient, issue, stats)];
+                case 9:
+                    _a.sent();
+                    _a.label = 10;
+                case 10: return [2 /*return*/, true];
             }
         });
     });
 }
+/**
+ * Retrives the current labels of a given pull request and adds the specified label
+ * @param client The Octokit client
+ * @param prNumber The number of the pull request to update
+ * @param label The label to add
+ * @returns True if all requests succeeded
+ */
 function addLabel(client, prNumber, label) {
     return __awaiter(this, void 0, void 0, function () {
-        var current, data, labels;
+        var current, data, labels, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, client.issues.listLabelsOnIssue({
-                        owner: github_1.context.repo.owner,
-                        repo: github_1.context.repo.repo,
-                        issue_number: prNumber,
-                    })];
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, client.issues.listLabelsOnIssue({
+                            owner: github_1.context.repo.owner,
+                            repo: github_1.context.repo.repo,
+                            issue_number: prNumber,
+                        })];
                 case 1:
                     current = _a.sent();
                     data = current.data;
@@ -153,46 +167,72 @@ function addLabel(client, prNumber, label) {
                 case 2:
                     _a.sent();
                     return [2 /*return*/, true];
+                case 3:
+                    error_1 = _a.sent();
+                    core.setFailed('failed to add label');
+                    return [2 /*return*/, false];
+                case 4: return [2 /*return*/];
             }
         });
     });
 }
+/**
+ * Retrieves statiscicts for all provided categories.
+ * The statistics include the number of open and closed pull requests.
+ * @param client The Octokit client
+ * @param categories The categories to fetch stats for
+ * @returns A promise of ProposalStatistics or undefined (if error occured)
+ */
 function getProposalStatistics(client, categories) {
     return __awaiter(this, void 0, void 0, function () {
-        var cat;
+        var cat, error_2;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, Promise.all(Object.keys(categories).map(function (category) { return __awaiter(_this, void 0, void 0, function () {
-                        var openPRs, closedPRs, _a, open, closed;
-                        return __generator(this, function (_b) {
-                            switch (_b.label) {
-                                case 0: return [4 /*yield*/, search(client, category, true, false)];
-                                case 1:
-                                    openPRs = _b.sent();
-                                    return [4 /*yield*/, search(client, category, false, true)];
-                                case 2:
-                                    closedPRs = _b.sent();
-                                    _a = [openPRs, closedPRs].map(function (res) { return res.data.total_count; }), open = _a[0], closed = _a[1];
-                                    return [2 /*return*/, {
-                                            category: category,
-                                            open: open,
-                                            closed: closed,
-                                            total: open + closed,
-                                        }];
-                            }
-                        });
-                    }); }))];
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, Promise.all(Object.keys(categories).map(function (category) { return __awaiter(_this, void 0, void 0, function () {
+                            var openPRs, closedPRs, _a, open, closed;
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0: return [4 /*yield*/, search(client, category, true, false)];
+                                    case 1:
+                                        openPRs = _b.sent();
+                                        return [4 /*yield*/, search(client, category, false, true)];
+                                    case 2:
+                                        closedPRs = _b.sent();
+                                        _a = [openPRs, closedPRs].map(function (res) { return res.data.total_count; }), open = _a[0], closed = _a[1];
+                                        return [2 /*return*/, {
+                                                category: category,
+                                                open: open,
+                                                closed: closed,
+                                                total: open + closed,
+                                            }];
+                                }
+                            });
+                        }); }))];
                 case 1:
                     cat = _a.sent();
                     console.log(cat);
                     return [2 /*return*/, {
                             categories: cat,
                         }];
+                case 2:
+                    error_2 = _a.sent();
+                    core.setFailed('failed to get proposal statistics');
+                    return [2 /*return*/, undefined];
+                case 3: return [2 /*return*/];
             }
         });
     });
 }
+/**
+ * Updates the target issue with the passed proposal statistics
+ * @param client The Octokit client
+ * @param issue The number of the issue to update
+ * @param stats The proposal statistics
+ * @returns A promise of void when complete
+ */
 function publishProposalStatistics(client, issue, stats) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -211,6 +251,11 @@ function publishProposalStatistics(client, issue, stats) {
         });
     });
 }
+/**
+ * Generates a markdown string based on given proposal statistics
+ * @param stats The statistics
+ * @returns A markdown formatted string
+ */
 function generateStatisticsBody(stats) {
     var tableRows = stats.categories
         .map(function (category) {
@@ -219,6 +264,14 @@ function generateStatisticsBody(stats) {
         .join('\n');
     return "\n  # Generated proposal summary\n  updated: " + new Date().toISOString() + "\n\n  | Category      | Open PRs      | Closed PRs  | Total |\n  | ------------- |:-------------:| -----------:| -----:|\n  " + tableRows + "\n  ";
 }
+/**
+ * Searches for pull requests on github with the given parameters
+ * @param client The Octokit client
+ * @param category The category label of the PRs
+ * @param open If the PRs are open or not
+ * @param merged If the PRs are merged or not
+ * @returns The raw http response for the Octokit client
+ */
 function search(client, category, open, merged) {
     return __awaiter(this, void 0, void 0, function () {
         var paramState, paramMerged, _a, owner, repo;
@@ -232,9 +285,12 @@ function search(client, category, open, merged) {
         });
     });
 }
-function setFailed(error) {
-    core.setFailed(error);
-}
+/**
+ * Checks if the files all are in the same category and the same author folder
+ * @param files The files to check
+ * @param categories The categories to check for
+ * @returns A string if a category was found, otherwise undefined
+ */
 function checkCategoryLabel(files, categories) {
     var _loop_1 = function (category) {
         if (files.length > 0) {
@@ -254,6 +310,13 @@ function checkCategoryLabel(files, categories) {
     return undefined;
 }
 exports.checkCategoryLabel = checkCategoryLabel;
+/**
+ * Checks if the files are in the same directory, this since the globs only check the format of the usernames
+ * and not that they are the same across all files.
+ * @param files The files to check
+ * @param category The category of the files
+ * @returns true if it is the same directory, otherwise false
+ */
 function checkSameDirectory(files, category) {
     var glob = category.glob, folder = category.folder;
     var filenames = files.map(function (file) { return file.filename.split('/'); });
@@ -271,12 +334,24 @@ function checkSameDirectory(files, category) {
     return true;
 }
 exports.checkSameDirectory = checkSameDirectory;
+/**
+ * Checks if the proposal file is new for this PR, thus, if the proposal label should be added.
+ * @param files The files included in the PR
+ * @param category The matched category
+ * @returns true if the proposal label should be added, otherwise false
+ */
 function shouldHaveProposalLabel(files, category) {
     var glob = category.glob, folder = category.folder, proposal = category.proposal;
     // Checks if the pr includes an added file by the name of category.proposal
     return files.some(function (file) { return file.status === 'added' && minimatch_1.default(file.filename, "" + glob + folder + "/" + proposal); });
 }
 exports.shouldHaveProposalLabel = shouldHaveProposalLabel;
+/**
+ * Retrieves the files of the targeted pull request
+ * @param client The Octokit client
+ * @param prNumber The number of the targeted pull request
+ * @returns A promise containing the files
+ */
 function getPullRequestFiles(client, prNumber) {
     return __awaiter(this, void 0, void 0, function () {
         var filesResponse;
@@ -294,6 +369,10 @@ function getPullRequestFiles(client, prNumber) {
         });
     });
 }
+/**
+ * Gets the number of the pull request, if applicable.
+ * @returns The PR number, if found, otherwise undefined
+ */
 function getPullRequestNumber() {
     var pr = github_1.context.payload.pull_request;
     if (!pr) {
@@ -301,6 +380,12 @@ function getPullRequestNumber() {
     }
     return pr.number;
 }
+/**
+ * Fetches a file from the PR and returns it as a string
+ * @param client The Octokit client
+ * @param path The path of the file
+ * @returns A promise of string
+ */
 function fetchFile(client, path) {
     return __awaiter(this, void 0, void 0, function () {
         var response;
@@ -319,6 +404,12 @@ function fetchFile(client, path) {
         });
     });
 }
+/**
+ * Parses the yaml configuration file from the repository
+ * @param client The Octokit client
+ * @param configPath The path to the config file
+ * @returns A promise of with the configuration, if not found it returns undefined
+ */
 function getConfiguration(client, configPath) {
     return __awaiter(this, void 0, void 0, function () {
         var configurationContent;

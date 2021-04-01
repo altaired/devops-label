@@ -1,7 +1,7 @@
 {
   "name": "devops-validator",
   "version": "1.0.0",
-  "description": "A GitHub action for validating incoming proposals through PRs",
+  "description": "A GitHub action for validating incoming proposals through PRs for the devops course at KTH",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && ncc build --source-map",
