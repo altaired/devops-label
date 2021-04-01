@@ -4,35 +4,35 @@ categories:
   course-automation:
     suffix: '**' # Set to '*' to not allow folders
     proposal: README.md # The name of the proposal file
-    folder: +([a-zA-Z])?(-+([a-zA-Z])) # Glob for validating the folder account names
+    folder: +([a-zA-Z0-9])?(-+([a-zA-Z0-9])) # Glob for validating the folder account names
     glob: demo/contributions/course-automation/
   presentation:
     suffix: '**'
     proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
+    folder: +([a-zA-Z0-9])?(-+([a-zA-Z0-9]))
     glob: demo/contributions/presentation/week[1-9]/
   demo:
     suffix: '**'
     proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
+    folder: +([a-zA-Z0-9])?(-+([a-zA-Z0-9]))?(-+([a-zA-Z0-9]))
     glob: demo/contributions/demo/
   essay:
     suffix: '**'
     proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
+    folder: +([a-zA-Z0-9])?(-+([a-zA-Z0-9]))?(-+([a-zA-Z0-9]))
     glob: demo/contributions/essay/
   executable-tutorial:
     suffix: '**'
     proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
+    folder: +([a-zA-Z0-9])?(-+([a-zA-Z0-9]))
     glob: demo/contributions/executable-tutorial/
   feedback:
     suffix: '**'
     proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
+    folder: +([a-zA-Z0-9])?(-+([a-zA-Z0-9]))
     glob: demo/contributions/feedback/
   open-source:
     suffix: '**'
     proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
+    folder: +([a-zA-Z0-9])?(-+([a-zA-Z0-9]))?(-+([a-zA-Z0-9]))
     glob: demo/contributions/open-source/
