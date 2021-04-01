@@ -16,7 +16,7 @@ Example of how to include the action in your workflow, the action is made to be 
 ```
 name: Validate and label PR
   id: vlpr
-  uses: altaired/devops-label@v1.1
+  uses: altaired/devops-label@v1.2
   with:
     github-token: ${{ secrets.GITHUB_TOKEN }}
     configuration-path: .github/config.yml
@@ -67,9 +67,9 @@ A glob describing the proposal file, for the devops course, `README.md` is used
 #### `<folder_glob>`
 A glob describing the structure of the author folder
 
-For the course, the following is used for most categories `+([a-zA-Z])?(-+([a-zA-Z]))`, allowing max 2 persons.
+For the course, the following is used for most categories `+([a-zA-Z0-9])?(-+([a-zA-Z0-9]))`, allowing max 2 persons.
 
-To allow max 3 persons, use the folowing `+([a-zA-Z])?(-+([a-zA-Z]))?(-+([a-zA-Z]))`
+To allow max 3 persons, use the folowing `+([a-zA-Z0-9])?(-+([a-zA-Z0-9]))?(-+([a-zA-Z0-9]))`
 
 #### `<category_glob>`
 A glob for matching the category, i.e the folder structure up until and not including the authors folder.
