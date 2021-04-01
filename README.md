@@ -1,119 +1,98 @@
-# PR Validator for DD2476 (Devops course)
+# DevOps course PR Validator
 
 A Github Action for labeling and validating pull requests containing contribution proposals in the course DD2476 at KTH, Sweden.
 
-## Get started
+The action does the following:
+* Checks that only a single category is modified on each checked PR
+* Checks that only a single folder in that category is modified
+* That the naming structure of the authors folder holds, e.g 'name1-name2'
+* If the PR is a proposal or not and assign a label if it is a proposal
+* Fetches statistics of all pull requests with the proposal label
 
-### Use the action
- 
-The action can be included in your action workflow as `altaired/devops-label@v1.1`
 
 
-
-Below is an example of a `.github/workflows/main.yml`
+## Usage
+Example of how to include the action in your workflow, the action is made to be run upon each pull request.
 ```
-on: [pull_request]
-
-jobs:
-  devops-label:
-    runs-on: ubuntu-latest
-    name: Pull Request Validator
-    steps:
-    - name: Validate and label PR
-      id: vlpr
-      uses: altaired/devops-label@v1.1
-      with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          configuration-path: .github/config.yml
-
+name: Validate and label PR
+  id: vlpr
+  uses: altaired/devops-label@v1.1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    configuration-path: .github/config.yml
 ```
 
-The action uses two inputs:
-```
-  github-token: A GitHub token with push access to the repository
-  
-  configuration-path: Path to the configuration path. If not provided, the default is '.github/config.yml'
-```
+### Inputs
+#### `github-token`
+An API token with push access, I recommend setting it to `${{ secrets.GITHUB_TOKEN }}`, which is the token of the github action bot.
 
-More about the configuration file can be found further down.
+#### `configuration-path`
+The path to the configuration file
 
-### Development
+### Configuration file
+In order for the action to work, a configuration file is **required**. The structure of the file is as follows:
 
-The action is built using Node.js and Typescript and jest is used for testing. NPM is used for managing packages.
-
-After cloning the repository, install the dependencies using:
+A complete example of a configuration file can be found [here](./.github/config.yml)
 
 ```
-npm install
+issue: <issue_number>
+dir: <directory>
+categories:
+  <label_name>:
+    suffix: <glob_suffix>
+    proposal: <proposal_filename>
+    folder: <folder_glob>
+    glob: <category_glob>
 ```
+The required `<parameter>` are as folows:
+#### `<issue_number>`
+The number of the issue where to post the proposal statistics
 
-To run the tests use:
-```
-npm run test
-```
+#### `<directory>`
+A glob for telling what directories to account for. Set to `"**"` to run for all files.
 
-#### Compile the action
-In order to use the action it has to be compiled first. This is can be done with NCC, using the following command:
-```
-npm run build && ncc build --source-map
-```
+#### `<label_name>`
+The name of the label
 
-## Configuration
-The action requires a configuration file, below is an example of such a file.
+#### `<glob_suffix>`
+A glob that is enforced on all children in the authors contribution folder.
 
-```
-# The number of the issue where the summary should be written to
-issue: 3 
+Set to `"*"` to not allow folders to be created.
 
-# The action only takes action for files matching this glob pattern
-dir: demo/contributions/** 
+Set to `"**"` to allow any files / folders
 
-# Below all categories is specified
-categories: 
-  course-automation:
-  
-    # A glob pattern for the files in the authors proposal folder. Set to '*' to not allow folders
-    suffix: '**' 
-    
-    # The name of the proposal file
-    proposal: README.md
-    
-    # Glob for validating the folder account names. This one allows two names in the format 'name1-name2'
-    folder: +([a-zA-Z])?(-+([a-zA-Z])) 
-    
-    # Glob for the base path of the category. Files matching will be labeled with this category
-    glob: demo/contributions/course-automation/ 
-    
-  presentation:
-    suffix: '**'
-    proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
-    glob: demo/contributions/course-automation/week[1-9]/
-  demo:
-    suffix: '**'
-    proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
-    glob: demo/contributions/demo/
-  essay:
-    suffix: '**'
-    proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
-    glob: demo/contributions/essay/
-  executable-tutorial:
-    suffix: '**'
-    proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
-    glob: demo/contributions/executable-tutorial/
-  feedback:
-    suffix: '**'
-    proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
-    glob: demo/contributions/feedback/
-  open-source:
-    suffix: '**'
-    proposal: README.md
-    folder: +([a-zA-Z])?(-+([a-zA-Z]))
-    glob: demo/contributions/open-source/
-```
+#### `<proposal_file>`
+A glob describing the proposal file, for the devops course, `README.md` is used
+
+#### `<folder_glob>`
+A glob describing the structure of the author folder
+
+For the course the following is used `+([a-zA-Z])?(-+([a-zA-Z]))`, allowing max 2 persons.
+
+To allow max 3 persons, use the folowing `+([a-zA-Z])?(-+([a-zA-Z]))?(-+([a-zA-Z]))`
+
+#### `<category_glob>`
+A glob for matching the category, i.e the folder structure up until and not including the authors folder.
+
+E.g. `demo/contributions/presentation/week[1-9]/`
+
+## Development
+The action is build with *Node.js*, *Typescript* and tested with *Jest*.
+
+After cloning the repository, run:
+`npm install` to install all dependencies.
+
+Some functionality is tested with *Jest* and these tests can be run using `npm run test`
+
+
+**IMPORTANT**
+In order for this action to be used without having to install dependencies and building it every time in other repositories, the action is built and compiled in the dist folder. This has to be done manually before each push. Use the command `npm run build` for this.
+
+## License Summary
+This code is made available under the MIT license.
+
+## Authors
+Simon Persson, simon@persson.dev
+
 
 
