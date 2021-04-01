@@ -1,6 +1,6 @@
 # DevOps course PR Validator
 
-A Github Action for labeling and validating pull requests containing contribution proposals in the course DD2476 at KTH, Sweden.
+A Github Action for labeling and validating pull requests containing contribution proposals in the course DD2482 at KTH, Sweden.
 
 The action does the following:
 * Checks that only a single category is modified on each checked PR
