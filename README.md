@@ -67,7 +67,7 @@ A glob describing the proposal file, for the devops course, `README.md` is used
 #### `<folder_glob>`
 A glob describing the structure of the author folder
 
-For the course the following is used `+([a-zA-Z])?(-+([a-zA-Z]))`, allowing max 2 persons.
+For the course, the following is used for most categories `+([a-zA-Z])?(-+([a-zA-Z]))`, allowing max 2 persons.
 
 To allow max 3 persons, use the folowing `+([a-zA-Z])?(-+([a-zA-Z]))?(-+([a-zA-Z]))`
 
@@ -77,7 +77,7 @@ A glob for matching the category, i.e the folder structure up until and not incl
 E.g. `demo/contributions/presentation/week[1-9]/`
 
 ## Development
-The action is build with *Node.js*, *Typescript* and tested with *Jest*.
+The action is built with *Node.js*, *Typescript* and tested with *Jest*.
 
 After cloning the repository, run:
 `npm install` to install all dependencies.
