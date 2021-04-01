@@ -91,6 +91,9 @@ In order for this action to be used without having to install dependencies and b
 ## License Summary
 This code is made available under the MIT license.
 
+## Limitations
+It is suggested that the action is only scheduled to run on every pull request, since every push will result in a lot of unneccesary runs. However, this causes the statistics to not be updated immediately when a pull request is merged. The data will still be correct though once updated, but there will be a delay. To avoid the delay it can be run on each push, even though I don't recomend it. 
+
 ## Authors
 Simon Persson, simon@persson.dev
 
