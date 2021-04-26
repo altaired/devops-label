@@ -7,9 +7,11 @@ The action does the following:
 * Checks that only a single folder in that category is modified
 * That the naming structure of the authors folder holds, e.g 'name1-name2'
 * If the PR is a proposal or not and assign a label if it is a proposal
-* Fetches statistics of all pull requests with the proposal label
+* Fetches statistics of all pull requests with the proposal label and puts it in a provided issue.
 
+## Example summary
 
+An example of the calculated summary can be found in issue #3. It checks how many proposals of each category are open vs merged.
 
 ## Usage
 Example of how to include the action in your workflow, the action is made to be run upon each pull request.
